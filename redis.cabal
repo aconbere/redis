@@ -1,0 +1,30 @@
+name: redis
+author: Anders Conbere <aconbere@conbere.org>
+license: OtherLicense
+license-file: LICENSE
+version: 0.1
+homepage: http://github.com/aconbere/redis
+synopsis: a haskell redis client
+description: a learning project for using sockets, etc.
+build-type: Simple
+cabal-version: >= 1.2
+
+library
+    exposed-modules:    Redis
+    build-depends:
+        base,
+        QuickCheck >= 2.0.0.0
+
+    ghc-options: -Wall
+    ghc-prof-options:   -prof -auto-all
+
+executable redis-client
+    main-is:            Main.hs
+    other-modules:      Redis
+
+    ghc-options:        -funbox-strict-fields -Wall
+    ghc-prof-options:   -prof -auto-all
+
+executable redis-test
+    main-is: Redis/Test.hs
+    ghc-options: -main-is Redis.Test
