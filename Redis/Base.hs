@@ -1,7 +1,7 @@
 module Redis.Base where
 
 import Network
-import Network.Socket
+--import Network.Socket
 import System.IO
 
 data RedisValue = RedisString String | RedisInteger Int deriving (Show)
@@ -40,7 +40,7 @@ integerReply h = do
     l <- hGetLine h
     return (Just (RedisInteger (read l::Int)))
 
---bulkReply :: Handle -> IO (Maybe RedisValue)
+bulkReply :: Handle -> IO (Maybe RedisValue)
 bulkReply h = do
     l <- hGetLine h
     let bytes = read l::Int
@@ -58,6 +58,7 @@ getReplyType h prefix =
         ':' -> integerReply h
         '+' -> singleLineReply h
 
+takeChar :: Int -> Handle -> IO(String)
 takeChar n h = takeChar' n h ""
 
 takeChar' :: Int -> Handle -> String -> IO(String)

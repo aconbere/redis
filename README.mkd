@@ -1,0 +1,19 @@
+This is a super simple foundation for a redis client in Haskell.
+
+to install the following should suffice
+
+> git clone git://github.com/aconbere/RadisH.git
+> cd Radish
+> cabal install
+
+At that point from ghci
+
+> :m Redis
+> r <- redis "127.0.0.1" 6379
+> bulk r "SET" "key" (show 1234)
+> getReply
+Just (RedisString "OK")
+> inline_query r "GET" "key"
+Just (RedisString "1234")
+
+Clearly this is sub optimal for general use, but the basics seem to work pretty well.
