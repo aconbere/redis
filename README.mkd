@@ -8,13 +8,13 @@ to install the following should suffice
 
 At that point from ghci
 
-*Redis> :m Redis
-*Redis> r <- redis "127.0.0.1" 6379
-*Redis> bulk r "SET" "abc" "1234"
-*Redis> getReply r
-Just (RedisString "OK")
-*Redis> inline_query  r "GET" "abc"
-*Redis> getReply r
-Just (RedisString "1234")
+    *Redis> :m Redis
+    *Redis> r <- redis "127.0.0.1" 6379
+    *Redis> bulk r "SET" "abc" "1234"
+    *Redis> getReply r
+    Just (RedisString "OK")
+    *Redis> inline_query  r "GET" "abc"
+    *Redis> getReply r
+    Just (RedisString "1234")
 
 Clearly this is sub optimal for general use, but the basics seem to work pretty well.
