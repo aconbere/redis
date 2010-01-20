@@ -10,11 +10,7 @@ At that point from ghci
 
     *Redis> :m Redis
     *Redis> r <- redis "127.0.0.1" 6379
-    *Redis> bulk r "SET" "abc" "1234"
-    *Redis> getReply r
+    *Redis> set r "key" "value"
     Just (RedisString "OK")
-    *Redis> inline_query  r "GET" "abc"
-    *Redis> getReply r
-    Just (RedisString "1234")
-
-Clearly this is sub optimal for general use, but the basics seem to work pretty well.
+    *Redis> get r "key"
+    Just (RedisString "value")
