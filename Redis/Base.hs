@@ -1,8 +1,8 @@
 module Redis.Base where
 
 import Network
---import Network.Socket
 import System.IO
+import List
 
 data RedisValue = RedisString String | RedisInteger Int deriving (Show)
 
@@ -14,11 +14,8 @@ redis host port =
         hSetBuffering h NoBuffering
         return h
 
-inline_query :: Handle -> String -> String -> IO()
-inline_query h command value = hPutStrLn h (command ++ " " ++ value)
-
-inline :: Handle -> String -> IO()
-inline = hPutStrLn
+inline :: Handle -> String -> [String] -> IO()
+inline h command values = hPutStrLn h $ concat $ intersperse " " ([command] ++ values)
 
 bulk :: Handle -> String -> String -> String -> IO()
 bulk handle command key value = do
@@ -57,6 +54,8 @@ getReplyType h prefix =
         '$' -> bulkReply h
         ':' -> integerReply h
         '+' -> singleLineReply h
+        '-' -> singleLineReply h
+         _  -> singleLineReply h
 
 takeChar :: Int -> Handle -> IO(String)
 takeChar n h = takeChar' n h ""
