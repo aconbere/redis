@@ -14,7 +14,7 @@ library
                         Redis.Base
                         Redis.Commands
     build-depends:
-        base,
+        base >= 4.0.0,
         network,
         QuickCheck >= 2.0.0.0
 

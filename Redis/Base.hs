@@ -2,7 +2,7 @@ module Redis.Base where
 
 import Network
 import System.IO
-import List
+import Data.List
 
 data RedisValue = RedisString String | RedisInteger Int deriving (Show)
 
@@ -55,7 +55,7 @@ getReplyType h prefix =
         ':' -> integerReply h
         '+' -> singleLineReply h
         '-' -> singleLineReply h
-         _  -> singleLineReply h
+        _ -> singleLineReply h
 
 takeChar :: Int -> Handle -> IO(String)
 takeChar n h = takeChar' n h ""

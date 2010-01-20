@@ -18,8 +18,8 @@ expireAt h key unixtime = command h $ inline h "RENAMEX" [key, unixtime]
 ttl h key = command h $ inline h "TTL" [key]
 select h index = command h $ inline h "SELECT" [index]
 move h key index = command h $ inline h "MOVE" [key, index]
-flushDB h = command h $ inline h "FLUSHDB"
-flushAll h = command h $ inline h "FLUSHALL"
+flushDB h = command h $ inline h "FLUSHDB" []
+flushAll h = command h $ inline h "FLUSHALL" []
 
 -- STRINGS
 get h k = command h $ inline h "GET" [k]
