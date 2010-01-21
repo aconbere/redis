@@ -4,7 +4,9 @@ import Network
 import System.IO
 import Data.List
 
-data RedisValue = RedisString String | RedisInteger Int deriving (Show)
+data RedisValue = RedisString String
+                | RedisInteger Int
+                | RedisMulti [Maybe RedisValue] deriving (Show)
 
 redis :: HostName -> PortNumber -> IO Handle
 redis host port =
@@ -14,13 +16,33 @@ redis host port =
         hSetBuffering h NoBuffering
         return h
 
-inline :: Handle -> String -> [String] -> IO()
-inline h command values = hPutStrLn h $ concat $ intersperse " " ([command] ++ values)
 
-bulk :: Handle -> String -> String -> String -> IO()
-bulk handle command key value = do
-    hPutStrLn handle (command ++ " " ++ key ++ " " ++  " " ++ show (length value))
+-- Comand helpers
+
+command h f = do f >> getReply h
+
+inline :: Handle -> String -> [String] -> IO()
+inline h command args = hPutStrLn h $ concat $ intersperse " " ([command] ++ args)
+
+bulk :: Handle -> String -> [String] -> String -> IO()
+bulk handle command args value = do
+    inline handle command (args ++ [(show $ length value)])
     hPutStrLn handle value
+
+multiBulk :: Handle -> [[String]] -> IO()
+multiBulk handle commands = do
+    hPutStrLn handle ("*" ++ (show $ length commands))
+    mapM_ (hPutStrLn handle) (concatMap formatBulkCommand commands)
+
+multiBulk' handle command kvs = do
+    multiBulk handle (map (\(k, v) -> [command, k, v]) kvs)
+
+formatBulkCommand :: [String] -> [String]
+formatBulkCommand c =
+    concat $ zipWith (\x y -> [x, y]) (map (\i -> "$" ++ (show $ length i)) c) c
+
+
+-- Reply Helpers
 
 getReply :: Handle -> IO (Maybe RedisValue)
 getReply h = do
@@ -46,7 +68,21 @@ bulkReply h = do
         then return Nothing
         else do
             v <- takeChar bytes h
+            hGetLine h -- cleans up
             return (Just (RedisString v))
+
+multiBulkReply :: Handle -> IO (Maybe RedisValue)
+multiBulkReply h = do
+    l <- hGetLine h
+    let items = read l::Int
+    multiBulkReply' h items []
+
+multiBulkReply' :: Handle -> Int -> [Maybe RedisValue] -> IO (Maybe RedisValue)
+multiBulkReply' h 0 values = return (Just (RedisMulti values))
+multiBulkReply' h n values = do
+    hGetChar h -- discard the type data since we know it's a bulk string
+    v <- bulkReply h
+    multiBulkReply' h (n - 1) (values ++ [v])
 
 getReplyType :: Handle -> Char -> IO (Maybe RedisValue)
 getReplyType h prefix =
@@ -55,6 +91,7 @@ getReplyType h prefix =
         ':' -> integerReply h
         '+' -> singleLineReply h
         '-' -> singleLineReply h
+        '*' -> multiBulkReply h
         _ -> singleLineReply h
 
 takeChar :: Int -> Handle -> IO(String)

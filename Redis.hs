@@ -4,4 +4,4 @@ module Redis (
     ) where
 
 import Redis.Base
-import Redis.Commands
+import qualified Redis.Commands
