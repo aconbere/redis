@@ -2,21 +2,19 @@ name: redis
 author: Anders Conbere <aconbere@conbere.org>
 license: OtherLicense
 license-file: LICENSE
-version: 0.1
-homepage: http://github.com/aconbere/RadisH
+version: 0.4
+homepage: http://github.com/aconbere/redis
 synopsis: a haskell redis client
 description: a learning project for using sockets, etc.
 build-type: Simple
 cabal-version: >= 1.2
 
 library
-    exposed-modules:    Redis
-                        Redis.Base
-                        Redis.Commands
-    build-depends:
-        base >= 4.0.0,
-        network,
-        QuickCheck >= 2.0.0.0
-
-    --ghc-options: -Wall
-    ghc-prof-options:   -prof -auto-all
+    exposed-modules: Redis,
+                     Redis.Base,
+                     Redis.Commands,
+                     Redis.Commands.Set,
+                     Redis.Commands.List,
+                     Redis.Commands.SortedSet
+    build-depends: base,
+                   network

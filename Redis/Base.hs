@@ -34,6 +34,7 @@ multiBulk handle commands = do
     hPutStrLn handle ("*" ++ (show $ length commands))
     mapM_ (hPutStrLn handle) (concatMap formatBulkCommand commands)
 
+multiBulk' :: Handle -> String -> [(String, String)] -> IO()
 multiBulk' handle command kvs = do
     multiBulk handle (map (\(k, v) -> [command, k, v]) kvs)
 
